@@ -1,0 +1,114 @@
+<?php 
+
+require 'facebook-php-sdk/src/facebook.php';
+require 'appinfo.conf';
+
+$maxfile = 8192;
+$userdatadir = 'userdata';
+
+$facebook = new Facebook(array(
+  'appId'  => APP_ID,
+  'secret' => SECRET,
+));
+
+$user = $facebook->getUser();
+
+
+if ($user) {
+  try {
+      $user_profile = $facebook->api('/me');
+      $friend_graph = $facebook->api('/me/friends');
+      $filename = $userdatadir . "/" . $user_profile["id"] . ".dat";
+      $prev_filename = $userdatadir . "/" . $user_profile["id"] . "-prev.dat";
+  } catch (FacebookApiException $e) {
+    error_log($e);
+    $user = null;
+  }
+}
+
+if ($user) {
+  $logoutUrl = $facebook->getLogoutUrl();
+} else {
+  $loginUrl = $facebook->getLoginUrl();
+}
+
+if($user) {
+     	$friends = $friend_graph[data];
+
+
+      $ids = array();
+     	$index = 0;
+
+     	foreach ($friends as $friend) {
+     		$ids[$index] = $friend['id'];
+     		$index++;
+     	}
+
+     	if(file_exists($filename)) {
+     		$fh = fopen($filename, 'r+');
+     		$old_ids = json_decode(fread($fh, $maxfile));
+
+
+     		$losers = array_diff($old_ids, $ids);
+ 		    ftruncate($fh, 0);
+ 			rewind($fh);
+ 			fwrite($fh, json_encode($ids));
+
+     		if (!$losers) {
+     			echo ("Congrats! You're so cool that no one has unfriended you since last time!");
+     		}
+     		else {
+     			echo ("The following losers unfriended you since last time:<br>");
+
+     			foreach ($losers as $index => $id) {
+     				$graph_url = "https://graph.facebook.com/" . $id . "?fields=name,picture";
+   	  			$loser_info = json_decode(file_get_contents($graph_url));
+            $loser_pic = $loser_info->picture->data->url;
+   	  			echo('<img src="' . $loser_pic . '"> ' . $loser_info->name . '<br>');
+     			}
+     		}
+
+        if(file_exists($prev_filename)) {
+          $fh = fopen($prev_filename, 'r');
+          $prev_losers = json_decode(fread($fh, $maxfile), true);
+          echo ("<br>But don't forget the losers who previously unfriended you:<br>");
+
+          foreach ($prev_losers as $cur_loser) {
+            $graph_url = "https://graph.facebook.com/" . $cur_loser . "?fields=name,picture";
+            $loser_info = json_decode(file_get_contents($graph_url));
+            $loser_pic = $loser_info->picture->data->url;
+            echo('<img src="' . $loser_pic . '"> ' . $loser_info->name . '<br>');
+          }
+          fclose($fh);
+
+        }
+
+
+        if($prev_losers || $losers) {
+          $fh = fopen($prev_filename, 'w');
+          if(!$prev_losers) {
+            $prev_losers = $losers;
+          } else {
+            $prev_losers = array_merge($prev_losers, $losers);
+          }
+
+          fwrite($fh, json_encode($prev_losers));
+          fclose($fh);
+        }
+     	}
+     	else {
+        if (!is_dir($userdatadir)) {
+          mkdir($userdatadir, 0777, true);
+        }
+
+     		$fh = fopen($filename, 'w');
+     		fwrite($fh, json_encode($ids));
+     		echo ("This is your first time checking! We'll keep an eye out in case anybody decides to unfriend you!");
+     	}
+     	
+     	fclose($fh);
+} else {
+  echo('<a href="' . $loginUrl . '">Login using Facebook');
+}
+
+ ?>
