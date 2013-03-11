@@ -3,6 +3,8 @@ unfriended
 
 A script to periodically determine who has unfriended you from Facebook
 
+Running live at http://globallyvariable.com/unfriended/index.php
+
 Configuration
 ======
 
