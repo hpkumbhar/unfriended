@@ -1,3 +1,10 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Unfriended: See who's been unfriending you!</title>
+</head>
+
+<body>
 <?php 
 
 require 'facebook-php-sdk/src/facebook.php';
@@ -55,30 +62,32 @@ if($user) {
  			fwrite($fh, json_encode($ids));
 
      		if (!$losers) {
-     			echo ("Congrats! You're so cool that no one has unfriended you since last time!");
+     			echo ("<div id='congrats'>Congrats! You're so cool that no one has unfriended you since last time!</div>");
      		}
      		else {
-     			echo ("The following losers unfriended you since last time:<br>");
+     			echo ("<div id='new-losers'>The following losers unfriended you since last time:<ul>");
 
      			foreach ($losers as $index => $id) {
      				$graph_url = "https://graph.facebook.com/" . $id . "?fields=name,picture";
    	  			$loser_info = json_decode(file_get_contents($graph_url));
             $loser_pic = $loser_info->picture->data->url;
-   	  			echo('<img src="' . $loser_pic . '"> ' . $loser_info->name . '<br>');
+   	  			echo('<li><img src="' . $loser_pic . '"> ' . $loser_info->name . '</li>');
      			}
+          echo ('</ul></div>');
      		}
 
         if(file_exists($prev_filename)) {
           $fh = fopen($prev_filename, 'r');
           $prev_losers = json_decode(fread($fh, $maxfile), true);
-          echo ("<br>But don't forget the losers who previously unfriended you:<br>");
+          echo ("<div id='old-losers'>But don't forget the losers who previously unfriended you:<ul>");
 
           foreach ($prev_losers as $cur_loser) {
             $graph_url = "https://graph.facebook.com/" . $cur_loser . "?fields=name,picture";
             $loser_info = json_decode(file_get_contents($graph_url));
             $loser_pic = $loser_info->picture->data->url;
-            echo('<img src="' . $loser_pic . '"> ' . $loser_info->name . '<br>');
+            echo('<li><img src="' . $loser_pic . '"> ' . $loser_info->name . '</li>');
           }
+          echo ('</ul></div>');
           fclose($fh);
 
         }
@@ -111,4 +120,7 @@ if($user) {
   echo('<a href="' . $loginUrl . '">Login using Facebook');
 }
 
- ?>
+?>
+</body>
+
+</html>
