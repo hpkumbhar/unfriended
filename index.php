@@ -1,3 +1,14 @@
+<?php 
+
+require 'facebook-php-sdk/src/facebook.php';
+require 'appinfo.conf';
+
+$facebook = new Facebook(array(
+  'appId'  => APP_ID,
+  'secret' => SECRET,
+));
+
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -5,18 +16,10 @@
 </head>
 
 <body>
-<?php 
 
-require 'facebook-php-sdk/src/facebook.php';
-require 'appinfo.conf';
-
+<?php
 $maxfile = 8192;
 $userdatadir = 'userdata';
-
-$facebook = new Facebook(array(
-  'appId'  => APP_ID,
-  'secret' => SECRET,
-));
 
 $user = $facebook->getUser();
 
