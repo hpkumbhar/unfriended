@@ -12,7 +12,8 @@ $facebook = new Facebook(array(
 <!DOCTYPE html>
 <html>
 <head>
-<title>Unfriended: See who's been unfriending you!</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <title>Unfriended: See who's been unfriending you!</title>
 </head>
 
 <body>
@@ -54,18 +55,29 @@ if($user) {
      		$index++;
      	}
 
+      //if user has visited before, file will already exist
      	if(file_exists($filename)) {
      		$fh = fopen($filename, 'r+');
      		$old_ids = json_decode(fread($fh, $maxfile));
 
-
-     		$losers = array_diff($old_ids, $ids);
+        //compare new friends list to old friends list
+     		$potential_losers = array_diff($old_ids, $ids);
  		    ftruncate($fh, 0);
  			rewind($fh);
  			fwrite($fh, json_encode($ids));
 
+        //check to make sure users actually exist and haven't just deleted their profiles
+        $losers = array();
+        foreach ($potential_losers as $index => $id) {
+          $graph_url = "https://graph.facebook.com/" . $id;
+          $graph_return = json_decode(file_get_contents($graph_url));
+          if ($graph_return) {
+            array_push($losers, $id);
+          }
+        }
+
      		if (!$losers) {
-     			echo ("<div id='congrats'>Congrats! You're so cool that no one has unfriended you since last time!</div>");
+     		  echo ("<div id='congrats'>Congrats! You're so cool that no one has unfriended you since last time!</div>");
      		}
      		else {
      			echo ("<div id='new-losers'>The following losers unfriended you since last time:<ul>");
