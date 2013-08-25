@@ -3,9 +3,13 @@ unfriended
 
 A script to periodically determine who has unfriended you from Facebook
 
-Running live at http://globallyvariable.com/unfriended/index.php
+Running live at http://www.michaeljcardillo.com/unfriended/
 
 Configuration
 ======
 
-Insert your Facebook App ID and Secret in the appdata.conf file. App will create a "userdata" file the first time it is run in the same directory as index.php if it does not already exist.
+Run the following SQL query to setup the required database.
+
+`CREATE DATABASE unfriended; USE unfriended; CREATE TABLE friends(user_id BIGINT, friend_id BIGINT);`
+
+Then, update appinfo.conf with your database and Facebook App info.

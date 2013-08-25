@@ -19,18 +19,16 @@ $facebook = new Facebook(array(
 <body>
 
 <?php
-$maxfile = 8192;
-$userdatadir = 'userdata';
 
 $user = $facebook->getUser();
 
+$mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
 if ($user) {
   try {
       $user_profile = $facebook->api('/me');
+      $user_id = $user_profile['id'];
       $friend_graph = $facebook->api('/me/friends');
-      $filename = $userdatadir . "/" . $user_profile["id"] . ".dat";
-      $prev_filename = $userdatadir . "/" . $user_profile["id"] . "-prev.dat";
   } catch (FacebookApiException $e) {
     error_log($e);
     $user = null;
@@ -46,8 +44,9 @@ if ($user) {
 if($user) {
      	$friends = $friend_graph['data'];
 
+        $res = $mysqli->query("SELECT friend_id FROM friends WHERE user_id = $user_id");
 
-      $ids = array();
+        $ids = array();
      	$index = 0;
 
      	foreach ($friends as $friend) {
@@ -55,20 +54,25 @@ if($user) {
      		$index++;
      	}
 
-      //if user has visited before, file will already exist
-     	if(file_exists($filename)) {
-     		$fh = fopen($filename, 'r+');
-     		$old_ids = json_decode(fread($fh, $maxfile));
+        //if user has visited before, records will already exist
+     	if($res->num_rows > 0) {
+            $old_ids = array();
+            while ($row = mysqli_fetch_array($res, MYSQLI_ASSOC)) {
+                $old_ids[] = $row['friend_id'];
+            }
 
         //compare new friends list to old friends list
      		$potential_losers = array_diff($old_ids, $ids);
- 		    ftruncate($fh, 0);
- 			rewind($fh);
- 			fwrite($fh, json_encode($ids));
+     		$new_friends = array_diff($ids, $old_ids);
+            
+            foreach ($new_friends as $index => $id) {
+                $mysqli->query("INSERT INTO friends VALUES ($user_id, $id)");
+            }
 
         //check to make sure users actually exist and haven't just deleted their profiles
         $losers = array();
         foreach ($potential_losers as $index => $id) {
+          $mysqli->query("DELETE FROM friends WHERE user_id = $user_id AND friend_id = $id");
           $graph_url = "https://graph.facebook.com/" . $id;
           $graph_return = json_decode(file_get_contents($graph_url));
           if ($graph_return) {
@@ -91,9 +95,13 @@ if($user) {
           echo ('</ul></div>');
      		}
 
-        if(file_exists($prev_filename)) {
-          $fh = fopen($prev_filename, 'r');
-          $prev_losers = json_decode(fread($fh, $maxfile), true);
+        $res = $mysqli->query("SELECT friend_id FROM friends WHERE user_id = -$user_id");
+
+        if($res->num_rows > 0) {
+          $prev_losers = array();
+          while ($row = mysqli_fetch_array($res, MYSQLI_ASSOC)) {
+            $prev_losers[] = $row['friend_id'];
+          } 
           echo ("<div id='old-losers'>But don't forget the losers who previously unfriended you:<ul>");
 
           foreach ($prev_losers as $cur_loser) {
@@ -103,33 +111,20 @@ if($user) {
             echo('<li><img src="' . $loser_pic . '"> ' . $loser_info->name . '</li>');
           }
           echo ('</ul></div>');
-          fclose($fh);
-
         }
 
 
-        if($prev_losers || $losers) {
-          $fh = fopen($prev_filename, 'w');
-          if(!$prev_losers) {
-            $prev_losers = $losers;
-          } else {
-            $prev_losers = array_merge($prev_losers, $losers);
-          }
-
-          fwrite($fh, json_encode($prev_losers));
+        if($losers) {
+            $mysqli->query("INSERT INTO friends VALUES (-$user_id, $id)");
         }
      	}
      	else {
-        if (!is_dir($userdatadir)) {
-          mkdir($userdatadir, 0777, true);
-        }
-
-     		$fh = fopen($filename, 'w');
-     		fwrite($fh, json_encode($ids));
+            foreach ($ids as $cur_id) {
+                $mysqli->query("INSERT INTO friends VALUES ($user_id, $cur_id)");
+            }
      		echo ("This is your first time checking! We'll keep an eye out in case anybody decides to unfriend you!");
      	}
      	
-     	fclose($fh);
 } else {
   echo('<a href="' . $loginUrl . '">Login using Facebook');
 }
