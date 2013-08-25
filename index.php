@@ -44,7 +44,7 @@ if ($user) {
 }
 
 if($user) {
-     	$friends = $friend_graph[data];
+     	$friends = $friend_graph['data'];
 
 
       $ids = array();
@@ -117,7 +117,6 @@ if($user) {
           }
 
           fwrite($fh, json_encode($prev_losers));
-          fclose($fh);
         }
      	}
      	else {
