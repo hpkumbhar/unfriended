@@ -4,8 +4,8 @@ body {
 	color: #0095E6;
 }
 
-hr {
-	width:90%;
+h1 {
+    font-size: 30px;
 }
 
 ul {
@@ -27,6 +27,13 @@ li:hover {
     -webkit-box-shadow: -7px 8px 8px -5px #999;
     -o-box-shadow: -7px 8px 8px -5px #999;
     box-shadow: -7px 8px 8px -5px #999;
+}
+
+#intro {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    width: 450px;
 }
 
 .closeX {

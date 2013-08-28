@@ -125,8 +125,9 @@ if ($user) {
          }
 
 } else {
-  echo('<a href="' . $loginUrl . '">Login using Facebook');
-}
+    echo("<div id='intro'><h1>Unfriended:</h1><h2>See who's been unfriending you!</h2><p>Unfriended tracks which of your so-called friends have recently unfriended you! Sign in below to get started!</p><a href=$loginUrl><img src='images/facebook_signin.png'></a></div>");
+
+    }
 
 ?>
 
