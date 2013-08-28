@@ -14,6 +14,7 @@ $facebook = new Facebook(array(
 <head>
   <link rel="stylesheet" type="text/css" href="style.css">
   <title>Unfriended: See who's been unfriending you!</title>
+  <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
 </head>
 
 <body>
@@ -28,6 +29,7 @@ if ($user) {
   try {
       $user_profile = $facebook->api('/me');
       $user_id = $user_profile['id'];
+      $_SESSION['uid'] = $user_id;
       $friend_graph = $facebook->api('/me/friends');
   } catch (FacebookApiException $e) {
     error_log($e);
@@ -83,13 +85,13 @@ if ($user) {
              if (!$losers) {
                echo ("<div id='congrats'>Congrats! You're so cool that no one has unfriended you since last time!</div>");
              } else {
-                 echo ("<div id='new-losers'>The following losers unfriended you since last time:<ul>");
+                 echo ("<div id='new-losers'>The following losers unfriended you since last time (if you were the one that deleted them, then just close the box and they will not be counted):<ul>");
 
                  foreach ($losers as $index => $id) {
                      $graph_url = "https://graph.facebook.com/" . $id . "?fields=name,picture";
                      $loser_info = json_decode(file_get_contents($graph_url));
             $loser_pic = $loser_info->picture->data->url;
-                     echo('<li><img src="' . $loser_pic . '"> ' . $loser_info->name . '</li>');
+                     echo('<li id="' . $id . '"><img src="' . $loser_pic . '"> ' . $loser_info->name . '<div class="closeX">&#10006</div></li>');
                  }
           echo ('</ul></div>');
              }
@@ -107,7 +109,7 @@ if ($user) {
             $graph_url = "https://graph.facebook.com/" . $cur_loser . "?fields=name,picture";
             $loser_info = json_decode(file_get_contents($graph_url));
             $loser_pic = $loser_info->picture->data->url;
-            echo('<li><img src="' . $loser_pic . '"> ' . $loser_info->name . '</li>');
+            echo('<li id="' . $cur_loser . '"><img src="' . $loser_pic . '"> ' . $loser_info->name . '<div class="closeX">&#10006</div></li>');
           }
           echo ('</ul></div>');
         }
@@ -127,6 +129,8 @@ if ($user) {
 }
 
 ?>
+
+<script src="my.js" type="text/javascript"></script>
 </body>
 
 </html>

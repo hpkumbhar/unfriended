@@ -14,6 +14,7 @@ ul {
 
 li {
 	display: inline-block;
+    position: relative;
 	border: 1px solid;
 	border-radius: 4px;
 	width: 300px;
@@ -26,15 +27,17 @@ li:hover {
     -webkit-box-shadow: -7px 8px 8px -5px #999;
     -o-box-shadow: -7px 8px 8px -5px #999;
     box-shadow: -7px 8px 8px -5px #999;
-    margin-top: -2px;
-    margin-bottom: 12px;
 }
 
-#all-losers {
-			background-color: #33CCFF;
-			padding: 10px 10px 10px 10px;
-			border-radius:4px; 
-			border:1px solid; 
-			width:450px;
-			margin:0 auto;
+.closeX {
+    position: absolute;
+    right: -4px; top: 0px; width: 20px;
 }
+
+.closeX:hover {
+    color:red;
+    cursor: default;
+    right: -5px; top: -1px;
+    -webkit-transition:color 500ms ease;  
+}
+
