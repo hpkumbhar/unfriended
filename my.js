@@ -17,15 +17,15 @@ $( ".closeX" ).click(function() {
             url: 'remover.php',
             type: 'POST',
             data: 'id=' + id});
-        $( this ).parent().fadeOut(400, function() { 
-            $( this ).parent().remove(); 
+        $( ".gray-out" ).fadeOut(400, function() { 
+            $( this ).remove(); 
             $( "#" + id).fadeOut(400); 
         })
     });
 
     $( "#no.button" ).click(function(){
-        $( this ).parent().fadeOut(400, function() { 
-            $( this ).parent().remove(); 
+        $( ".gray-out" ).fadeOut(400, function() { 
+            $( this ).remove(); 
         })
     });
 });
