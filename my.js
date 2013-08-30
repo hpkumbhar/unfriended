@@ -1,5 +1,4 @@
 $( ".closeX" ).click(function() {
-    $( this ).hide();
     var id = $( this ).parent().attr("id");
     var markup = [
         '<div class="gray-out">',
@@ -10,7 +9,7 @@ $( ".closeX" ).click(function() {
         '</div></div>'].join('');
         
     $( markup ).hide().appendTo('body');
-    $( "#" + id ).appendTo(".confirmBox");
+    $( "#" + id ).clone().appendTo(".confirmBox").children('.closeX').hide();
     $( ".gray-out" ).fadeIn();
 
     $( "#yes.button" ).click(function(){
@@ -18,14 +17,15 @@ $( ".closeX" ).click(function() {
             url: 'remover.php',
             type: 'POST',
             data: 'id=' + id});
-        $( this ).parent().fadeOut(400, function() { $( this ).parent().remove() })
+        $( this ).parent().fadeOut(400, function() { 
+            $( this ).parent().remove(); 
+            $( "#" + id).fadeOut(400); 
+        })
     });
 
     $( "#no.button" ).click(function(){
-                $( this ).parent().fadeOut(400, function() { 
-                    $( "#" + id ).appendTo("#oldLosers");
-                    $( "#" + id ).children(".closeX").show();
-                    $( this ).parent().remove(); 
-                })
+        $( this ).parent().fadeOut(400, function() { 
+            $( this ).parent().remove(); 
+        })
     });
 });
