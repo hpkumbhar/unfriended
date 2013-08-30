@@ -18,7 +18,6 @@ $facebook = new Facebook(array(
 </head>
 
 <body>
-
 <?php
 
 $user = $facebook->getUser();
@@ -103,7 +102,7 @@ if ($user) {
           while ($row = mysqli_fetch_array($res, MYSQLI_ASSOC)) {
             $prev_losers[] = $row['friend_id'];
           }
-          echo ("<div id='old-losers'>But don't forget the losers who previously unfriended you:<ul>");
+          echo ("<div id='old-losers'>But don't forget the losers who previously unfriended you:<ul id='oldLosers'>");
 
           foreach ($prev_losers as $cur_loser) {
             $graph_url = "https://graph.facebook.com/" . $cur_loser . "?fields=name,picture";

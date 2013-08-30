@@ -36,6 +36,32 @@ li:hover {
     width: 450px;
 }
 
+.button {
+    background-color:#74DDFC;
+    bottom: 25px;
+	border: 1px solid;
+	border-radius: 4px;
+    position:absolute;
+    width: 90px;
+    height: 45px;
+}
+
+.button:hover{
+    background-color:#52D1F7;
+}
+
+.button p{
+    text-align: center;
+}
+
+#yes.button {
+    left: 20%;
+}
+
+#no.button {
+    right: 20%;
+}
+
 .closeX {
     position: absolute;
     right: -4px; top: 0px; width: 20px;
@@ -48,3 +74,23 @@ li:hover {
     -webkit-transition:color 500ms ease;  
 }
 
+.confirmBox {
+    background-color: rgba(202,235,252,1.0);
+    border: 3px solid;
+    border-radius: 4px;
+    height: 175px;
+    padding: 40px;
+    position: fixed;
+    top: 30%;
+    left: 30%;
+}
+
+.gray-out {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    background-color: rgba(112,138,144,0.5);
+}
